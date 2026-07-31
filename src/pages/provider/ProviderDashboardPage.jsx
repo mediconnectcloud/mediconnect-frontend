@@ -1,27 +1,12 @@
-import { useEffect, useState } from "react";
-import { getBookingsForProvider } from "../../api/bookings";
+import { useProviderBookings } from "../../hooks/useProviderBookings";
 import Card from "../../components/Card";
-import Loading from "../../components/Loading";
-
-// DUMMY: in the real app the provider's own providerId would come from
-// their account/profile. Hardcoded here since there is no backend yet.
-const DEMO_PROVIDER_ID = "PRV-101";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import EmptyState from "../../components/EmptyState";
 
 export default function ProviderDashboardPage() {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { bookings, loading } = useProviderBookings();
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const data = await getBookingsForProvider(DEMO_PROVIDER_ID);
-      setBookings(data);
-      setLoading(false);
-    }
-    load();
-  }, []);
-
-  if (loading) return <Loading />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="page">
@@ -56,7 +41,7 @@ export default function ProviderDashboardPage() {
             </p>
           </Card>
         ))}
-        {bookings.length === 0 && <p className="muted">No bookings yet.</p>}
+        {bookings.length === 0 && <EmptyState message="No bookings yet." />}
       </div>
     </div>
   );

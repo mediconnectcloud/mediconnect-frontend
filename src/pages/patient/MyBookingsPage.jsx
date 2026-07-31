@@ -1,39 +1,19 @@
-import { useEffect, useState } from "react";
-import { getMyBookings, updateBookingStatus } from "../../api/bookings";
-import { useAuth } from "../../context/AuthContext";
+import { useMyBookings } from "../../hooks/useMyBookings";
 import Card from "../../components/Card";
 import Button from "../../components/Button";
-import Loading from "../../components/Loading";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import EmptyState from "../../components/EmptyState";
 
 export default function MyBookingsPage() {
-  const { user } = useAuth();
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { bookings, loading, cancelBooking } = useMyBookings();
 
-  async function load() {
-    setLoading(true);
-    const data = await getMyBookings(user.username);
-    setBookings(data);
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function handleCancel(id) {
-    await updateBookingStatus(id, "cancelled");
-    load();
-  }
-
-  if (loading) return <Loading />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="page">
       <h1>My Bookings</h1>
 
-      {bookings.length === 0 && <p className="muted">You have no bookings yet.</p>}
+      {bookings.length === 0 && <EmptyState message="You have no bookings yet." />}
 
       <div className="grid">
         {bookings.map((b) => (
@@ -47,7 +27,7 @@ export default function MyBookingsPage() {
               Status: <span className="badge">{b.status}</span>
             </p>
             {b.status === "confirmed" && (
-              <Button variant="secondary" onClick={() => handleCancel(b.id)}>
+              <Button variant="secondary" onClick={() => cancelBooking(b.id)}>
                 Cancel
               </Button>
             )}

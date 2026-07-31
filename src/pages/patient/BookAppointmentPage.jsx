@@ -1,59 +1,21 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getDoctorById } from "../../api/doctors";
-import { getSlotsByDoctor } from "../../api/slots";
-import { createBooking } from "../../api/bookings";
-import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
+import { useBookAppointment } from "../../hooks/useBookAppointment";
 import SlotCard from "../../components/SlotCard";
 import Button from "../../components/Button";
-import Loading from "../../components/Loading";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import ErrorMessage from "../../components/ErrorMessage";
+import EmptyState from "../../components/EmptyState";
 
 export default function BookAppointmentPage() {
   const { doctorId } = useParams();
-  const { user } = useAuth();
   const navigate = useNavigate();
-
-  const [doctor, setDoctor] = useState(null);
-  const [slots, setSlots] = useState([]);
+  const { doctor, slots, loading, booking, error, confirmed, confirmSlot } =
+    useBookAppointment(doctorId);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [booking, setBooking] = useState(false);
-  const [error, setError] = useState("");
-  const [confirmed, setConfirmed] = useState(null);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const [doctorData, slotsData] = await Promise.all([
-        getDoctorById(doctorId),
-        getSlotsByDoctor(doctorId),
-      ]);
-      setDoctor(doctorData);
-      setSlots(slotsData);
-      setLoading(false);
-    }
-    load();
-  }, [doctorId]);
-
-  async function handleConfirm() {
-    if (!selectedSlot) return;
-    setBooking(true);
-    setError("");
-    try {
-      const result = await createBooking({
-        patientUsername: user.username,
-        slotId: selectedSlot.id,
-      });
-      setConfirmed(result);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBooking(false);
-    }
-  }
-
-  if (loading) return <Loading />;
-  if (!doctor) return <p>Doctor not found.</p>;
+  if (loading) return <LoadingSpinner />;
+  if (!doctor) return <EmptyState message="Doctor not found." />;
 
   if (confirmed) {
     return (
@@ -89,12 +51,15 @@ export default function BookAppointmentPage() {
             onSelect={setSelectedSlot}
           />
         ))}
-        {slots.length === 0 && <p className="muted">No slots have been set up yet.</p>}
+        {slots.length === 0 && <EmptyState message="No slots have been set up yet." />}
       </div>
 
-      {error && <p className="error">{error}</p>}
+      {error && <ErrorMessage message={error} />}
 
-      <Button onClick={handleConfirm} disabled={!selectedSlot || booking}>
+      <Button
+        onClick={() => confirmSlot(selectedSlot.id)}
+        disabled={!selectedSlot || booking}
+      >
         {booking ? "Confirming..." : "Confirm booking"}
       </Button>
     </div>

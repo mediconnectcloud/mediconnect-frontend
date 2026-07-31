@@ -1,56 +1,25 @@
-import { useEffect, useState } from "react";
-import { getDoctorsByProvider } from "../../api/doctors";
-import { getSlotsByDoctor, addSlot, blockSlot } from "../../api/slots";
+import { useState } from "react";
+import { useProviderSlots } from "../../hooks/useProviderSlots";
 import Card from "../../components/Card";
 import Button from "../../components/Button";
-import Loading from "../../components/Loading";
-
-const DEMO_PROVIDER_ID = "PRV-101";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import EmptyState from "../../components/EmptyState";
 
 export default function ManageSlotsPage() {
-  const [doctors, setDoctors] = useState([]);
-  const [selectedDoctorId, setSelectedDoctorId] = useState("");
-  const [slots, setSlots] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { doctors, selectedDoctorId, setSelectedDoctorId, slots, loading, create, block } =
+    useProviderSlots();
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-
-  useEffect(() => {
-    async function load() {
-      const docs = await getDoctorsByProvider(DEMO_PROVIDER_ID);
-      setDoctors(docs);
-      if (docs.length > 0) setSelectedDoctorId(docs[0].id);
-      setLoading(false);
-    }
-    load();
-  }, []);
-
-  useEffect(() => {
-    async function loadSlots() {
-      if (!selectedDoctorId) return;
-      const data = await getSlotsByDoctor(selectedDoctorId);
-      setSlots(data);
-    }
-    loadSlots();
-  }, [selectedDoctorId]);
 
   async function handleAddSlot(e) {
     e.preventDefault();
     if (!date || !time) return;
-    await addSlot({ doctorId: selectedDoctorId, date, time });
+    await create({ date, time });
     setDate("");
     setTime("");
-    const data = await getSlotsByDoctor(selectedDoctorId);
-    setSlots(data);
   }
 
-  async function handleBlock(id) {
-    await blockSlot(id);
-    const data = await getSlotsByDoctor(selectedDoctorId);
-    setSlots(data);
-  }
-
-  if (loading) return <Loading />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="page">
@@ -86,13 +55,13 @@ export default function ManageSlotsPage() {
               Status: <span className="badge">{slot.status}</span>
             </p>
             {slot.status === "available" && (
-              <Button variant="secondary" onClick={() => handleBlock(slot.id)}>
+              <Button variant="secondary" onClick={() => block(slot.id)}>
                 Block this slot
               </Button>
             )}
           </Card>
         ))}
-        {slots.length === 0 && <p className="muted">No slots yet for this doctor.</p>}
+        {slots.length === 0 && <EmptyState message="No slots yet for this doctor." />}
       </div>
     </div>
   );

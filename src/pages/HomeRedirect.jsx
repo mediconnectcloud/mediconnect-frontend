@@ -1,11 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
-const ROLE_HOME = {
-  patient: "/search",
-  provider: "/provider/dashboard",
-  admin: "/admin",
-};
+import { ROLE_HOME } from "../utils/constants";
 
 export default function HomeRedirect() {
   const { user } = useAuth();

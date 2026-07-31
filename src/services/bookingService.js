@@ -1,10 +1,13 @@
-import { fakeDelay } from "./fakeDelay";
+import { fakeDelay } from "../api/fakeDelay";
 import { bookings, doctors, providers, slots, makeBookingId } from "../data/db";
-import { markSlotBooked } from "./slots";
+import { markSlotBooked } from "./slotService";
+// import apiClient from "../api/apiClient";
+// import endpoints from "../api/endpoints";
 
-// POST /bookings
-// This mirrors the real DynamoDB transaction described in the architecture
-// plan: check the slot, mark it booked, then create the booking record.
+// This mirrors the real DynamoDB transaction from the architecture plan:
+// check the slot, mark it booked, then create the booking record. Once
+// the backend exists, this whole check-then-write sequence becomes a
+// single POST - the backend does the transaction, not the frontend.
 export async function createBooking({ patientUsername, slotId }) {
   const slot = slots.find((s) => s.id === slotId);
   if (!slot || slot.status !== "available") {
@@ -27,22 +30,29 @@ export async function createBooking({ patientUsername, slotId }) {
   };
   bookings.push(newBooking);
   return fakeDelay(newBooking, 500);
+
+  // Real version:
+  // const { data } = await apiClient.post(endpoints.bookings, { slotId });
+  // return data;
 }
 
-// GET /bookings/mine
 export async function getMyBookings(patientUsername) {
   return fakeDelay(bookings.filter((b) => b.patientUsername === patientUsername));
+  // Real version:
+  // const { data } = await apiClient.get(endpoints.myBookings);
+  // return data;
 }
 
-// GET /providers/:providerId/bookings
 export async function getBookingsForProvider(providerId) {
   const providerDoctorIds = doctors.filter((d) => d.providerId === providerId).map((d) => d.id);
   return fakeDelay(bookings.filter((b) => providerDoctorIds.includes(b.doctorId)));
 }
 
-// PATCH /bookings/:id
 export async function updateBookingStatus(id, status) {
   const found = bookings.find((b) => b.id === id);
   if (found) found.status = status;
   return fakeDelay(found || null);
+  // Real version:
+  // const { data } = await apiClient.patch(endpoints.bookingById(id), { status });
+  // return data;
 }

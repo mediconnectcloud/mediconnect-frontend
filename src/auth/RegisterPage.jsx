@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import ErrorMessage from "../components/ErrorMessage";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -49,7 +50,7 @@ export default function RegisterPage() {
             />
           </label>
 
-          {error && <p className="error">{error}</p>}
+          {error && <ErrorMessage message={error} />}
 
           <Button type="submit" disabled={loading}>
             {loading ? "Creating account..." : "Register"}

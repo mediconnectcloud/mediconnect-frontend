@@ -1,33 +1,16 @@
-import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getProviderById } from "../../api/providers";
-import { getDoctorsByProvider } from "../../api/doctors";
+import { useProviderDetails } from "../../hooks/useProviderDetails";
 import Card from "../../components/Card";
 import Button from "../../components/Button";
-import Loading from "../../components/Loading";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import EmptyState from "../../components/EmptyState";
 
 export default function ProviderDetailsPage() {
   const { id } = useParams();
-  const [provider, setProvider] = useState(null);
-  const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { provider, doctors, loading } = useProviderDetails(id);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const [providerData, doctorsData] = await Promise.all([
-        getProviderById(id),
-        getDoctorsByProvider(id),
-      ]);
-      setProvider(providerData);
-      setDoctors(doctorsData);
-      setLoading(false);
-    }
-    load();
-  }, [id]);
-
-  if (loading) return <Loading />;
-  if (!provider) return <p>Provider not found.</p>;
+  if (loading) return <LoadingSpinner />;
+  if (!provider) return <EmptyState message="Provider not found." />;
 
   return (
     <div className="page">
@@ -51,7 +34,7 @@ export default function ProviderDetailsPage() {
             </Link>
           </Card>
         ))}
-        {doctors.length === 0 && <p className="muted">No doctors listed yet.</p>}
+        {doctors.length === 0 && <EmptyState message="No doctors listed yet." />}
       </div>
     </div>
   );

@@ -1,17 +1,22 @@
-import { fakeDelay } from "./fakeDelay";
+import { fakeDelay } from "../api/fakeDelay";
 import { doctors } from "../data/db";
+// import apiClient from "../api/apiClient";
+// import endpoints from "../api/endpoints";
 
-// GET /providers/:providerId/doctors
 export async function getDoctorsByProvider(providerId) {
   return fakeDelay(doctors.filter((d) => d.providerId === providerId));
+  // Real version:
+  // const { data } = await apiClient.get(endpoints.doctorsByProvider(providerId));
+  // return data;
 }
 
-// GET /doctors/:id
 export async function getDoctorById(id) {
   return fakeDelay(doctors.find((d) => d.id === id) || null);
+  // Real version:
+  // const { data } = await apiClient.get(endpoints.doctorById(id));
+  // return data;
 }
 
-// POST /doctors
 export async function addDoctor({ providerId, name, specialization, fee }) {
   const newDoctor = {
     id: `DOC-${Math.floor(Math.random() * 9000) + 1000}`,
@@ -22,11 +27,16 @@ export async function addDoctor({ providerId, name, specialization, fee }) {
   };
   doctors.push(newDoctor);
   return fakeDelay(newDoctor);
+  // Real version:
+  // const { data } = await apiClient.post(endpoints.doctorsByProvider(providerId), { name, specialization, fee });
+  // return data;
 }
 
-// DELETE /doctors/:id
 export async function removeDoctor(id) {
   const index = doctors.findIndex((d) => d.id === id);
   if (index !== -1) doctors.splice(index, 1);
   return fakeDelay({ success: true });
+  // Real version:
+  // await apiClient.delete(endpoints.doctorById(id));
+  // return { success: true };
 }

@@ -1,6 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/logo.svg";
 
+// Top navbar used by MainLayout (public pages + Patient pages).
+// Provider/Admin navigation lives in the Sidebar inside DashboardLayout instead.
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -13,6 +16,7 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <Link to="/" className="navbar__brand">
+        <img src={logo} alt="" width="24" height="24" />
         MediConnect
       </Link>
 
@@ -30,16 +34,6 @@ export default function Navbar() {
             <Link to="/my-bookings">My Bookings</Link>
           </>
         )}
-
-        {user && user.role === "provider" && (
-          <>
-            <Link to="/provider/dashboard">Dashboard</Link>
-            <Link to="/provider/doctors">Doctors</Link>
-            <Link to="/provider/slots">Slots</Link>
-          </>
-        )}
-
-        {user && user.role === "admin" && <Link to="/admin">Admin Dashboard</Link>}
 
         {user && (
           <span className="navbar__user">

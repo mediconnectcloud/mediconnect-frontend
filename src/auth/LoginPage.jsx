@@ -3,12 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Card from "../components/Card";
 import Button from "../components/Button";
-
-const ROLE_HOME = {
-  patient: "/search",
-  provider: "/provider/dashboard",
-  admin: "/admin",
-};
+import ErrorMessage from "../components/ErrorMessage";
+import { ROLE_HOME } from "../utils/constants";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -67,7 +63,7 @@ export default function LoginPage() {
             </select>
           </label>
 
-          {error && <p className="error">{error}</p>}
+          {error && <ErrorMessage message={error} />}
 
           <Button type="submit" disabled={loading}>
             {loading ? "Logging in..." : "Log in"}

@@ -1,7 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import Navbar from "./components/Navbar";
 import ProtectedRoute from "./routes/ProtectedRoute";
+
+import MainLayout from "./layouts/MainLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 import HomeRedirect from "./pages/HomeRedirect";
 import LoginPage from "./auth/LoginPage";
@@ -21,14 +23,13 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 export default function App() {
   return (
     <AuthProvider>
-      <Navbar />
-      <main>
-        <Routes>
+      <Routes>
+        {/* Public + Patient pages share the top-navbar layout */}
+        <Route element={<MainLayout />}>
           <Route path="/" element={<HomeRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Patient */}
           <Route
             path="/search"
             element={
@@ -61,46 +62,34 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+        </Route>
 
-          {/* Provider */}
-          <Route
-            path="/provider/dashboard"
-            element={
-              <ProtectedRoute role="provider">
-                <ProviderDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/provider/doctors"
-            element={
-              <ProtectedRoute role="provider">
-                <ManageDoctorsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/provider/slots"
-            element={
-              <ProtectedRoute role="provider">
-                <ManageSlotsPage />
-              </ProtectedRoute>
-            }
-          />
+        {/* Provider "back office" pages share the sidebar layout */}
+        <Route
+          element={
+            <ProtectedRoute role="provider">
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/provider/dashboard" element={<ProviderDashboardPage />} />
+          <Route path="/provider/doctors" element={<ManageDoctorsPage />} />
+          <Route path="/provider/slots" element={<ManageSlotsPage />} />
+        </Route>
 
-          {/* Admin */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute role="admin">
-                <AdminDashboardPage />
-              </ProtectedRoute>
-            }
-          />
+        {/* Admin pages also use the sidebar layout */}
+        <Route
+          element={
+            <ProtectedRoute role="admin">
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/admin" element={<AdminDashboardPage />} />
+        </Route>
 
-          <Route path="*" element={<HomeRedirect />} />
-        </Routes>
-      </main>
+        <Route path="*" element={<HomeRedirect />} />
+      </Routes>
     </AuthProvider>
   );
 }

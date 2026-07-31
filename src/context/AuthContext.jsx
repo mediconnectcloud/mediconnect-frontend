@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import * as authApi from "../api/auth";
+import * as authService from "../services/authService";
 
 const AuthContext = createContext(null);
 
@@ -7,18 +7,23 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null); // { username, role, name } | null
 
   async function login({ username, role }) {
-    const loggedInUser = await authApi.login({ username, role });
+    const loggedInUser = await authService.login({ username, role });
+    // A real token would come back from Cognito here. Stored under this
+    // key so apiClient.js can attach it to every request automatically.
+    window.sessionStorage.setItem("mediconnect_token", `dummy-token-${loggedInUser.username}`);
     setUser(loggedInUser);
     return loggedInUser;
   }
 
   async function register({ username, role }) {
-    const newUser = await authApi.register({ username, role });
+    const newUser = await authService.register({ username, role });
+    window.sessionStorage.setItem("mediconnect_token", `dummy-token-${newUser.username}`);
     setUser(newUser);
     return newUser;
   }
 
   function logout() {
+    window.sessionStorage.removeItem("mediconnect_token");
     setUser(null);
   }
 

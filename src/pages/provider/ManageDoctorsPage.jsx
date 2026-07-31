@@ -1,42 +1,23 @@
-import { useEffect, useState } from "react";
-import { getDoctorsByProvider, addDoctor, removeDoctor } from "../../api/doctors";
+import { useState } from "react";
+import { useProviderDoctors } from "../../hooks/useProviderDoctors";
 import Card from "../../components/Card";
 import Button from "../../components/Button";
-import Loading from "../../components/Loading";
-
-const DEMO_PROVIDER_ID = "PRV-101";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { isRequired, isValidFee } from "../../utils/validators";
 
 export default function ManageDoctorsPage() {
-  const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { doctors, loading, create, remove } = useProviderDoctors();
   const [name, setName] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [fee, setFee] = useState("");
 
-  async function load() {
-    setLoading(true);
-    const data = await getDoctorsByProvider(DEMO_PROVIDER_ID);
-    setDoctors(data);
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    load();
-  }, []);
-
   async function handleAdd(e) {
     e.preventDefault();
-    if (!name.trim()) return;
-    await addDoctor({ providerId: DEMO_PROVIDER_ID, name, specialization, fee });
+    if (!isRequired(name) || !isValidFee(fee || 0)) return;
+    await create({ name, specialization, fee });
     setName("");
     setSpecialization("");
     setFee("");
-    load();
-  }
-
-  async function handleRemove(id) {
-    await removeDoctor(id);
-    load();
   }
 
   return (
@@ -63,7 +44,7 @@ export default function ManageDoctorsPage() {
       </Card>
 
       {loading ? (
-        <Loading />
+        <LoadingSpinner />
       ) : (
         <div className="grid">
           {doctors.map((doc) => (
@@ -71,7 +52,7 @@ export default function ManageDoctorsPage() {
               <h3>{doc.name}</h3>
               <p className="muted">{doc.specialization}</p>
               <p>Fee: ${doc.fee}</p>
-              <Button variant="secondary" onClick={() => handleRemove(doc.id)}>
+              <Button variant="secondary" onClick={() => remove(doc.id)}>
                 Remove
               </Button>
             </Card>

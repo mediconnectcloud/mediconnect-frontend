@@ -64,6 +64,9 @@ h3 {
   padding: 14px 28px;
 }
 .navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 700;
   font-size: 1.2rem;
   color: var(--blue-700);
@@ -101,6 +104,64 @@ h3 {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
+}
+
+.state-message {
+  margin: 24px 0;
+}
+
+/* Dashboard layout (Provider / Admin) */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+}
+.dashboard-layout__sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.navbar__brand--sidebar {
+  padding: 0 20px;
+}
+.dashboard-layout__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dashboard-layout__topbar {
+  display: flex;
+  justify-content: flex-end;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px;
+}
+.sidebar__link {
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+.sidebar__link:hover {
+  background: var(--bg);
+  text-decoration: none;
+}
+.sidebar__link--active {
+  background: var(--blue-50);
+  color: var(--blue-700);
+  font-weight: 600;
 }
 
 /* Layout */
@@ -278,4 +339,61 @@ h3 {
   font-size: 0.7rem;
   text-transform: capitalize;
   color: var(--muted);
+}
+
+/* Shared loading/error/empty state text */
+.state-message {
+  margin: 16px 0;
+}
+
+/* Dashboard layout (Provider / Admin) */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+}
+.dashboard-layout__sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.dashboard-layout__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.dashboard-layout__topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 28px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+.navbar__brand--sidebar {
+  padding: 0 4px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar__link {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+.sidebar__link:hover {
+  background: var(--bg);
+  text-decoration: none;
+}
+.sidebar__link--active {
+  background: var(--blue-50);
+  color: var(--blue-700);
+  font-weight: 600;
 }
